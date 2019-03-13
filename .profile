@@ -26,41 +26,45 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Aliases 
-alias ll="ls -al"
-alias dgit='git --git-dir ~/.dotfiles/.git --work-tree=$HOME'
-
 # Functions
-declare -A ECHOCOLORS=(
-                        ["black"]=0
-                        ["red"]=1
-                        ["green"]=2
-                        ["yellow"]=3
-                        ["blue"]=4
-                        ["magenta"]=5
-                        ["cyan"]=6
-                        ["white"]=7)
+declare -A ECHOCOLORS
+ECHOCOLORS[black]=0
+ECHOCOLORS[red]=1
+ECHOCOLORS[green]=2
+ECHOCOLORS[yellow]=3
+ECHOCOLORS[blue]=4
+ECHOCOLORS[magenta]=5
+ECHOCOLORS[cyan]=6
+ECHOCOLORS[white]=7
 
 echocolor() {
   local color value
 
   if [[ $# -eq 0 ]]; then
     echocolor "red" "Must provide a color."
-    exit 1
+    return 1
   fi
 
   color="$1"
-  value=${ECHOCOLORS["$color"]}
-  echo $value
+  if [ ! ${ECHOCOLORS[$color]+_} ]; then
+    echocolor "red" "Invalid color choice."
+    return 1
+  fi
 
-  tput setaf value 
+  value=${ECHOCOLORS[$color]}
+
+  tput setaf "$value"
   echo "${@:2}"  
+  tput setaf ${ECHOCOLORS[white]}
 }
 
-echo.green() {
-  tput setaf 2 
-  echo $@
-}
+# Aliases
+alias ll="ls -al"
+alias dgit='git --git-dir ~/.dotfiles/.git --work-tree=$HOME'
+
+alias echo_color_red='echocolor red "$@"'
+alias echo_color_green='echocolor green "$@"'
+
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
@@ -80,25 +84,35 @@ getMidwayCreds() {
   # You can also $(eval getMidwayCreds)
   # This is ugly because nested JSON.
   curl -Ls -b ~/.midway/cookie -c ~/.midway/cookie -H "x-amz-target: com.amazon.isengard.coral.IsengardService.GetAssumeRoleCredentials" --data-binary "${JSONBITS}" --header "Content-Encoding: amz-1.0" --header "Content-type: application/json" -X POST https://isengard-service.amazon.com/ | jq -r . | jq -r .AssumeRoleResult | jq -r '"export AWS_ACCESS_KEY_ID=\(.credentials.accessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.credentials.secretAccessKey)\nexport AWS_SESSION_TOKEN=\(.credentials.sessionToken)"'
+
 }
 
 awscredspls() {
-  local account oldid newid
-  account=$1
+  local account
 
-  oldid=$(echo "$AWS_ACCESS_KEY_ID")
+  export AWS_ACCESS_KEY_ID=""
+  export AWS_SECRET_KEY_ID=""
+  export AWS_SESSION_ID=""
+
+  if [[ $# -eq 0 ]]; then
+    set --
+    echo_color_red "Must provide an account"
+    return 1
+  fi
+
+  account=$1
+  set --
 
   mwinit
-  getMidwayCreds() "$1"
+  eval $(getMidwayCreds "$account")
 
-  newid=$(echo "$AWS_ACCESS_KEY_ID")
-
-  if [!"$oldid" == "$newid"]; then
-    echo.red "Error fetching temporary aws credentials."
-  else
-    echo.green "Success! Now authenticated with:"
-    echo "$account"
+  if [ -z $AWS_ACCESS_KEY_ID ]; then
+    echo_color_red "Error fetching credentials."
+    return 1
   fi
+
+  echo_color_green "Now authenticated with:"
+  echo "$account"
 }
 
 
