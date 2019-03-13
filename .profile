@@ -118,4 +118,4 @@ awscredspls() {
 
 # Aliases
 
-alias awswhoami='aws iam list-account-aliases | jq .AccountAliases[0]"
+alias awswhoami='aws iam list-account-aliases | jq .AccountAliases[0]'
