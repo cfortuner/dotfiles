@@ -11,6 +11,9 @@ export GOPATH="${HOME}/code/go"
 export GOROOT=/usr/local/Cellar/go/1.11.5/libexec
 export PATH=$PATH:$(go env GOPATH)/bin
 
+# Protobuf
+export PATH=$PATH:$HOME/.protobuf/bin
+
 # Python
 eval "$(pyenv init -)"
 
