@@ -1,8 +1,8 @@
-# Use homebrew installations rather than OS default 
+# Use homebrew installations rather than OS default
 export PATH=/usr/local/bin:"${PATH}"
 
 # ITerm2
-# Set CLICOLOR if you want Ansi Colors in iTerm2 
+# Set CLICOLOR if you want Ansi Colors in iTerm2
 export CLICOLOR=1
 export TERM=xterm-256color
 
@@ -57,7 +57,7 @@ echocolor() {
   value=${ECHOCOLORS[$color]}
 
   tput setaf "$value"
-  echo "${@:2}"  
+  echo "${@:2}"
   tput setaf ${ECHOCOLORS[white]}
 }
 
@@ -75,7 +75,7 @@ export PATH="$PATH:$HOME/.rvm/bin"
 
 
 #-----------------
-## Twitch Specific 
+## Twitch Specific
 #-----------------
 
 # Isengard AWS Creds
