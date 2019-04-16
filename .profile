@@ -8,8 +8,7 @@ export TERM=xterm-256color
 
 # Go
 export GOPATH="${HOME}/code/go"
-export GOROOT=/usr/local/Cellar/go/1.11.5/libexec
-export PATH=$PATH:$(go env GOPATH)/bin
+export PATH=$PATH:$GOPATH/bin
 
 # Protobuf
 export PATH=$PATH:$HOME/.protobuf/bin
@@ -73,6 +72,12 @@ alias echo_color_green='echocolor green "$@"'
 export PATH="$PATH:$HOME/.rvm/bin"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
+# Check to see if we have saved awscreds
+if [ -f "$HOME/.awscreds" ]; then
+  echo "Found aws creds."
+  source "$HOME/.awscreds"
+fi
+
 
 #-----------------
 ## Twitch Specific
@@ -113,6 +118,13 @@ awscredspls() {
     echo_color_red "Error fetching credentials."
     return 1
   fi
+
+  # Saving to file so we can access them in other tabs/windows
+  echo "export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"           > ~/.awscreds
+  echo "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"  >> ~/.awscreds
+  echo "export AWS_SECRET_KEY_ID=$AWS_SECRET_KEY_ID"          >> ~/.awscreds
+  echo "export AWS_SESSION_ID=$AWS_SESSION_ID"                >> ~/.awscreds
+  echo "export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"          >> ~/.awscreds
 
   echo_color_green "Now authenticated with:"
   echo "$account"
