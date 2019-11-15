@@ -28,6 +28,9 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+# BuilderToolbox
+export PATH=$HOME/.toolbox/bin:$PATH
+
 # Functions
 declare -A ECHOCOLORS
 ECHOCOLORS[black]=0
@@ -88,6 +91,7 @@ fi
 getMidwayCreds() {
   # Get account id and role, generate json payload
   JSONBITS=$(curl -Ls -b ~/.midway/cookie -c ~/.midway/cookie -H "x-amz-target: com.amazon.isengard.coral.IsengardService.GetPermissionsForUser" --header "Content-Encoding: amz-1.0" -X POST https://isengard-service.amazon.com/ | jq -r '.PermissionsForUserList[] | select(.AWSAccountMoniker.Status == "ACTIVE") | if .AWSAccountMoniker.Alias != null then .ProfileName = [.AWSAccountMoniker.Alias] else .ProfileName = .AWSAccountMoniker.Email / "@" end | select(.ProfileName[0] == "'$1'") | {AWSAccountID: .AWSAccountID, IAMRoleName: .IAMRoleNameList[0]}')
+
   # Using said JSON payload, get the variables to assume the roles, and then display them in shell variable form
   # You can also $(eval getMidwayCreds)
   # This is ugly because nested JSON.
@@ -95,12 +99,28 @@ getMidwayCreds() {
 
 }
 
+awscredsreset() {
+  unset AWS_ACCESS_KEY_ID
+  unset AWS_SECRET_ACCESS_KEY
+  unset AWS_SECRET_KEY_ID
+  unset AWS_SESSION_ID
+  unset AWS_PROFILE
+
+  # removing the .awscreds file
+  touch ~/.awscreds
+  rm ~/.awscreds
+
+  echo_color_green "ok...done"
+}
+
 awscredspls() {
   local account
 
-  export AWS_ACCESS_KEY_ID=""
-  export AWS_SECRET_KEY_ID=""
-  export AWS_SESSION_ID=""
+  unset AWS_ACCESS_KEY_ID
+  unset AWS_SECRET_ACCESS_KEY
+  unset AWS_SECRET_KEY_ID
+  unset AWS_SESSION_ID
+  unset AWS_PROFILE
 
   if [[ $# -eq 0 ]]; then
     set --
@@ -111,7 +131,7 @@ awscredspls() {
   account=$1
   set --
 
-  mwinit
+  mwinit --aea
   eval $(getMidwayCreds "$account")
 
   if [ -z $AWS_ACCESS_KEY_ID ]; then
