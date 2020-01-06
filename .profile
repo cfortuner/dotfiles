@@ -132,6 +132,7 @@ awscredspls() {
   set --
 
   mwinit --aea
+  echo $account
   eval $(getMidwayCreds "$account")
 
   if [ -z $AWS_ACCESS_KEY_ID ]; then
@@ -154,3 +155,7 @@ awscredspls() {
 # Aliases
 
 alias awswhoami='aws iam list-account-aliases | jq .AccountAliases[0]'
+
+# Exclude OSX specific files in ZIP archives
+alias zip="zip -x *.DS_Store -x *__MACOSX* -x *.AppleDouble*"
+
