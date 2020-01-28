@@ -77,7 +77,7 @@ export PATH="$PATH:$HOME/.rvm/bin"
 
 # Check to see if we have saved awscreds
 if [ -f "$HOME/.awscreds" ]; then
-  echo "Found aws creds."
+  #echo "Found aws creds."
   source "$HOME/.awscreds"
 fi
 
