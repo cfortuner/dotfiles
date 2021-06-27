@@ -1,0 +1,17 @@
+[core]
+	excludesfile = /Users/colin/.gitignore
+[user]
+	name = Colin Fortuner
+	email = cfortuner@gmail.com
+[alias]
+  co = checkout
+  df = diff
+  dfc = diff --staged
+  st = status
+  ci = commit
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+

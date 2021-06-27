@@ -4,6 +4,7 @@
 !.zshrc
 !.profile
 !.vimrc
+!.gitconfig
 
 # Folder view configuration files
 .DS_Store
