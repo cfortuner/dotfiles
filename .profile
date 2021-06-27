@@ -88,3 +88,7 @@ alias awswhoami='aws iam list-account-aliases | jq .AccountAliases[0]'
 # Exclude OSX specific files in ZIP archives
 alias zip="zip -x *.DS_Store -x *__MACOSX* -x *.AppleDouble*"
 
+
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init --path)"
